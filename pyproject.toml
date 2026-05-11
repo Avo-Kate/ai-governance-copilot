@@ -1,0 +1,38 @@
+[project]
+name = "ai-governance-copilot"
+version = "0.1.0"
+description = "A local AI governance copilot — risk classification, gap analysis, model card generation, and assessment report drafting against EU AI Act, NIST RMF, and ISO 42001."
+readme = "README.md"
+requires-python = ">=3.10"
+
+dependencies = [
+    "langchain>=0.3.0",
+    "langchain-community>=0.3.0",
+    "langchain-ollama>=0.2.0",
+    "langchain-chroma>=0.1.0",
+    "chromadb>=0.5.0",
+    "sentence-transformers>=3.0.0",
+    "streamlit>=1.40.0",
+    "pypdf>=4.0.0",
+    "pydantic>=2.0.0",
+    "python-dotenv>=1.0.0",
+    "rich>=13.0.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.0.0",
+    "pytest-cov>=5.0.0",
+    "ruff>=0.6.0",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.ruff]
+line-length = 88
+target-version = "py310"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
