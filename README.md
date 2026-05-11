@@ -95,8 +95,8 @@ uv run pytest
 ## Roadmap
 
 - [x] Step 1 — Project setup & skeleton
-- [ ] Step 2 — Document ingestion pipeline
-- [ ] Step 3 — RAG core
+- [x] Step 2 — Document ingestion pipeline
+- [x] Step 3 — RAG core
 - [ ] Step 4 — Risk classifier
 - [ ] Step 5 — Gap analyzer
 - [ ] Step 6 — Model card generator
