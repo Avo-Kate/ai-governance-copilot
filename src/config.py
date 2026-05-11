@@ -25,4 +25,4 @@ CHUNK_SIZE = 1000
 CHUNK_OVERLAP = 150
 
 # ── Retrieval ──────────────────────────────────────────────────────────────
-RETRIEVER_K = 6  # number of chunks to retrieve per query
+RETRIEVER_K = 10  # number of chunks to retrieve per query
