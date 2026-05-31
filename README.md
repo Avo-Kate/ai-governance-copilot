@@ -98,7 +98,7 @@ uv run pytest
 - [x] Step 2 — Document ingestion pipeline
 - [x] Step 3 — RAG core
 - [x] Step 4 — Risk classifier
-- [ ] Step 5 — Gap analyzer
+- [x] Step 5 — Gap analyzer
 - [ ] Step 6 — Model card generator
 - [ ] Step 7 — Report writer
 - [ ] Step 8 — Streamlit UI
