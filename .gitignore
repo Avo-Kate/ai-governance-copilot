@@ -36,6 +36,9 @@ Thumbs.db
 .vscode/settings.json
 .idea/
 
+# Claude Code context (local only)
+CLAUDE.md
+
 # Testing
 .pytest_cache/
 .coverage

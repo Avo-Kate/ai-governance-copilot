@@ -97,7 +97,7 @@ uv run pytest
 - [x] Step 1 — Project setup & skeleton
 - [x] Step 2 — Document ingestion pipeline
 - [x] Step 3 — RAG core
-- [ ] Step 4 — Risk classifier
+- [x] Step 4 — Risk classifier
 - [ ] Step 5 — Gap analyzer
 - [ ] Step 6 — Model card generator
 - [ ] Step 7 — Report writer
