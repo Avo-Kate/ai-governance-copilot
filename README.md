@@ -321,4 +321,4 @@ You should see all tests passing. This is useful after making any changes to the
 - [x] Step 5 — Gap analyzer
 - [x] Step 6 — Model card generator
 - [x] Step 7 — Report writer
-- [ ] Step 8 — Streamlit UI
+- [x] Step 8 — Streamlit UI
