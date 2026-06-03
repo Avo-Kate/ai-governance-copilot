@@ -120,16 +120,7 @@ class GapAnalysis(BaseModel):
 
 _SYSTEM = """\
 You are a compliance expert specialising in AI governance frameworks.
-Analyse the AI system described below against the specific framework rules provided.
-
-Framework: {framework_name}
-Framework summary: {framework_description}
-
-Relevant regulatory context extracted from the official documents:
-{context}
-
-AI system description:
-{system_description}
+Analyse the AI system against the specific framework rules provided.
 
 Your task:
 1. Identify which requirements of this framework apply to this type of AI system.
@@ -145,8 +136,22 @@ MET: <met req 1> | <met req 2> | ... (or NONE if nothing is addressed)
 GAPS: <gap 1> | <gap 2> | <gap 3> | ... (or NONE if fully compliant)\
 """
 
+_HUMAN = """\
+Framework: {framework_name}
+Framework summary: {framework_description}
+
+Relevant regulatory context extracted from the official documents:
+{context}
+
+AI system description:
+{system_description}
+
+Analyse this AI system against the {framework_name} framework.\
+"""
+
 _prompt = ChatPromptTemplate.from_messages([
     ("system", _SYSTEM),
+    ("human", _HUMAN),
 ])
 
 

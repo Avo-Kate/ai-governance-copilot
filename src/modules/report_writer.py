@@ -186,6 +186,16 @@ class AssessmentReport(BaseModel):
 _SYSTEM = """\
 You are a senior AI governance consultant writing a formal risk assessment report.
 
+Write two sections of the report. Be specific and professional. \
+Reference articles, annexes, or framework functions from the context where relevant.
+
+Reply with EXACTLY this format — no extra text before or after:
+EXECUTIVE_SUMMARY: <2-3 paragraphs summarising the system, its risk tier and why, \
+and the most critical compliance gaps requiring urgent attention>
+RECOMMENDED_ACTIONS: <action 1> | <action 2> | <action 3> | <action 4> | <action 5>\
+"""
+
+_HUMAN = """\
 System name: {system_name}
 System description: {system_description}
 
@@ -200,17 +210,12 @@ Compliance gaps identified ({total_gaps} total across {framework_count} framewor
 Regulatory context from the governance documents:
 {context}
 
-Write two sections of the report. Be specific and professional. \
-Reference articles, annexes, or framework functions from the context where relevant.
-
-Reply with EXACTLY this format — no extra text before or after:
-EXECUTIVE_SUMMARY: <2-3 paragraphs summarising the system, its risk tier and why, \
-and the most critical compliance gaps requiring urgent attention>
-RECOMMENDED_ACTIONS: <action 1> | <action 2> | <action 3> | <action 4> | <action 5>\
+Write the executive summary and recommended actions.\
 """
 
 _prompt = ChatPromptTemplate.from_messages([
     ("system", _SYSTEM),
+    ("human", _HUMAN),
 ])
 
 _RETRIEVAL_KEYWORDS = (

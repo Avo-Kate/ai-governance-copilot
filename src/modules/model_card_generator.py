@@ -148,15 +148,6 @@ _SYSTEM = """\
 You are an AI governance expert writing the regulatory sections of a model card \
 for an AI system. Use ONLY the provided regulatory context to ground your writing.
 
-Model name: {model_name}
-Model type: {model_type}
-Intended use: {intended_use}
-Deployment context: {deployment_context}
-Known limitations (user-supplied): {known_limitations}
-
-Regulatory context from EU AI Act, NIST AI RMF, and ISO 42001:
-{context}
-
 Write four governance sections for this model card. Be specific — reference \
 articles, framework functions, or clauses from the context where relevant. \
 Keep each section focused and practical (3-6 sentences or bullet points).
@@ -168,8 +159,22 @@ CAVEATS: <paragraph on conditions under which the model should not be used or re
 RECOMMENDATIONS: <paragraph of concrete steps the deploying organisation should take to meet regulatory obligations>\
 """
 
+_HUMAN = """\
+Model name: {model_name}
+Model type: {model_type}
+Intended use: {intended_use}
+Deployment context: {deployment_context}
+Known limitations (user-supplied): {known_limitations}
+
+Regulatory context from EU AI Act, NIST AI RMF, and ISO 42001:
+{context}
+
+Write the four governance sections for this model.\
+"""
+
 _prompt = ChatPromptTemplate.from_messages([
     ("system", _SYSTEM),
+    ("human", _HUMAN),
 ])
 
 _RETRIEVAL_KEYWORDS = (

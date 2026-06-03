@@ -49,6 +49,29 @@ for key, default in _DEFAULTS.items():
     st.session_state.setdefault(key, default)
 
 
+# ── Safe module invocation ───────────────────────────────────────────────────
+
+def run_module(spinner: str, fn, *args, **kwargs):
+    """
+    Call a copilot module with a spinner, surfacing failures as a friendly
+    error instead of a raw traceback. Returns the result, or None on failure.
+
+    Common causes: Ollama isn't running, or the local model returned a response
+    the parser couldn't read. Both are recoverable — the user can retry.
+    """
+    try:
+        with st.spinner(spinner):
+            return fn(*args, **kwargs)
+    except Exception as exc:  # noqa: BLE001 — surface any failure to the user
+        st.error(
+            "Something went wrong while running this analysis. Check that Ollama "
+            "is running, then try again or rephrase the system description.\n\n"
+            f"**Details:** {type(exc).__name__}: {exc}",
+            icon="🚫",
+        )
+        return None
+
+
 # ── Sidebar ──────────────────────────────────────────────────────────────────
 
 PAGES = [
@@ -130,10 +153,10 @@ def page_risk_classifier() -> None:
         if not description.strip():
             st.error("Please enter a system description.")
             return
-        with st.spinner("Classifying against the EU AI Act…"):
-            result = classify(description)
-        st.session_state.classification = result
-        st.session_state.classification_desc = description
+        result = run_module("Classifying against the EU AI Act…", classify, description)
+        if result is not None:
+            st.session_state.classification = result
+            st.session_state.classification_desc = description
 
     if st.session_state.classification is not None:
         st.divider()
@@ -170,10 +193,15 @@ def page_gap_analyzer() -> None:
         if not frameworks:
             st.error("Select at least one framework.")
             return
-        with st.spinner(f"Analyzing against {len(frameworks)} framework(s)…"):
-            result = analyze(description, frameworks=frameworks)
-        st.session_state.gap_analysis = result
-        st.session_state.gap_analysis_desc = description
+        result = run_module(
+            f"Analyzing against {len(frameworks)} framework(s)…",
+            analyze,
+            description,
+            frameworks=frameworks,
+        )
+        if result is not None:
+            st.session_state.gap_analysis = result
+            st.session_state.gap_analysis_desc = description
 
     if st.session_state.gap_analysis is not None:
         st.divider()
@@ -254,8 +282,13 @@ def page_model_card() -> None:
             evaluation_data=evaluation_data,
             known_limitations=known_limitations,
         )
-        with st.spinner("Writing governance sections from the regulatory docs…"):
-            st.session_state.model_card = generate(card_input)
+        card = run_module(
+            "Writing governance sections from the regulatory docs…",
+            generate,
+            card_input,
+        )
+        if card is not None:
+            st.session_state.model_card = card
 
     if st.session_state.model_card is not None:
         st.divider()
@@ -328,15 +361,15 @@ def page_report_writer() -> None:
             risk_classification=reuse_rc,
             gap_analysis=reuse_ga,
         )
-        with st.spinner("Drafting the assessment report…"):
-            report = write(report_input)
+        report = run_module("Drafting the assessment report…", write, report_input)
 
-        # Cache the freshly computed sub-results too, so other pages benefit.
-        st.session_state.report = report
-        st.session_state.classification = report.risk_classification
-        st.session_state.classification_desc = description
-        st.session_state.gap_analysis = report.gap_analysis
-        st.session_state.gap_analysis_desc = description
+        if report is not None:
+            # Cache the freshly computed sub-results too, so other pages benefit.
+            st.session_state.report = report
+            st.session_state.classification = report.risk_classification
+            st.session_state.classification_desc = description
+            st.session_state.gap_analysis = report.gap_analysis
+            st.session_state.gap_analysis_desc = description
 
     if st.session_state.report is not None:
         st.divider()

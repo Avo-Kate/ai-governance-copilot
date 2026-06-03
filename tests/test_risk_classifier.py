@@ -45,6 +45,77 @@ def test_parse_response_missing_fields():
     assert key_factors == []
 
 
+def test_parse_response_markdown_bold_labels():
+    # llama3.2 frequently wraps the labels and/or values in markdown bold.
+    raw = (
+        "**TIER:** High\n"
+        "**REASONING:** Employment decisions fall under Annex III.\n"
+        "**KEY_FACTORS:** employment | automated decision"
+    )
+    tier, reasoning, key_factors = _parse_response(raw)
+    assert tier == "High"
+    assert "Annex III" in reasoning
+    assert key_factors == ["employment", "automated decision"]
+
+
+def test_parse_response_bold_value_only():
+    raw = "TIER: **Unacceptable**\nREASONING: Prohibited by Article 5."
+    tier, _, _ = _parse_response(raw)
+    assert tier == "Unacceptable"
+
+
+def test_parse_response_lowercase_labels():
+    raw = "tier: Minimal\nreasoning: Spam filter.\nkey_factors: low risk"
+    tier, reasoning, key_factors = _parse_response(raw)
+    assert tier == "Minimal"
+    assert reasoning == "Spam filter."
+    assert key_factors == ["low risk"]
+
+
+def test_parse_response_preamble_then_label():
+    # The model adds a chatty preamble before the structured block.
+    raw = (
+        "Here is my classification:\n\n"
+        "TIER: High\n"
+        "REASONING: Used for promotion and firing decisions (Annex III)."
+    )
+    tier, _, _ = _parse_response(raw)
+    assert tier == "High"
+
+
+def test_parse_response_bulleted_labels():
+    raw = "- TIER: Limited\n- REASONING: Chatbot with disclosure."
+    tier, reasoning, _ = _parse_response(raw)
+    assert tier == "Limited"
+    assert reasoning == "Chatbot with disclosure."
+
+
+def test_parse_response_fallback_scans_for_tier():
+    # No structured TIER line at all — fall back to scanning the prose. This is
+    # the regression guard for the empty-tier ValidationError the UI surfaced.
+    raw = (
+        "This system clearly falls into the High risk category because it makes "
+        "employment decisions about promotion and termination."
+    )
+    tier, _, _ = _parse_response(raw)
+    assert tier == "High"
+
+
+def test_parse_response_fallback_picks_first_mentioned():
+    raw = "It is not Unacceptable, but it is High risk under Annex III."
+    tier, _, _ = _parse_response(raw)
+    # Unacceptable appears first in the text, so the fallback returns it.
+    assert tier == "Unacceptable"
+
+
+def test_parse_response_truly_unparseable_returns_empty():
+    # If nothing resembles a tier, we return "" and let the validator reject it
+    # rather than fabricating a classification.
+    raw = "I cannot determine this from the provided context."
+    tier, _, _ = _parse_response(raw)
+    assert tier == ""
+
+
 # ── RiskClassification model ───────────────────────────────────────────────────
 
 @pytest.mark.parametrize("tier", ["Unacceptable", "High", "Limited", "Minimal"])
